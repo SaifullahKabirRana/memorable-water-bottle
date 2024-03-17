@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 import Bottle from "../Bottle/Bottle";
 import './Bottles.css'
-import { addToLC, getStoredCart } from "../../utilities/localStorage";
+import { addToLC, getStoredCart, removeFromLS } from "../../utilities/localStorage";
 import Cart from "../Cart/Cart";
 
 const Bottles = () => {
@@ -19,21 +19,21 @@ const Bottles = () => {
     // load cart from local storage
     useEffect(() => {
         console.log('called the use effect', bottles.length);
-        if (bottles.length){
+        if (bottles.length) {
             const storedCart = getStoredCart();
-        console.log(storedCart, bottles);
-        
-        const savedCart = [];
-        for(const id of storedCart){
-            console.log(id);
-            const bottle = bottles.find(bottle => bottle.id === id);
-            if(bottle){
-                savedCart.push(bottle);
-            }
+            console.log(storedCart, bottles);
 
-        }
-        console.log("saved cart",savedCart);
-        setCart(savedCart);
+            const savedCart = [];
+            for (const id of storedCart) {
+                console.log(id);
+                const bottle = bottles.find(bottle => bottle.id === id);
+                if (bottle) {
+                    savedCart.push(bottle);
+                }
+
+            }
+            console.log("saved cart", savedCart);
+            setCart(savedCart);
 
         }
     }, [bottles])
@@ -44,10 +44,18 @@ const Bottles = () => {
         addToLC(bottle.id);
     }
 
+    const handleRemoveFromCart = id => {
+        // visual cart remove
+        const remainingCart = cart.filter(bottle => bottle.id !== id);
+        setCart(remainingCart);
+        // remove from LS
+        removeFromLS(id);
+    }
+
     return (
         <div>
             <h2>Bottles Available: {bottles.length}</h2>
-            <Cart cart={cart}></Cart>
+            <Cart cart={cart} handleRemoveFromCart={handleRemoveFromCart}></Cart>
             <div className="bottle-container">
                 {
                     bottles.map(bottle => <Bottle
